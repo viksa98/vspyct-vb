@@ -94,6 +94,9 @@ models/bspyct_hecat_noncensored.pcl
 models/spyct_reduced_v1.pcl
 models/vspyct_reduced_v1.pcl
 
+expermients/results/
+experiments/figures/
+
 #tex
 *.aux
 *.ps
@@ -118,3 +121,5 @@ notebooks/
 reports/
 final_results/
 models/*
+
+.claude/
