@@ -1,0 +1,85 @@
+# Benchmark Dataset Configuration for VSPYCT-GP Evaluation
+# OpenML CTR23 Suite (ID: 353) - Curated Tabular Regression 2023
+
+# Suite information
+suite:
+  id: 353
+  name: "CTR23 - Curated Tabular Regression 2023"
+  reference: "Fischer et al., AutoML Conference 2023"
+  url: "https://openml.org/search?type=study&id=353"
+
+# Selection criteria (from CTR23 paper)
+selection_criteria:
+  min_samples: 500
+  max_samples: 100000
+  max_features: 5000  # after one-hot encoding
+  target_type: numeric
+  min_target_values: 5
+  data_type: "tabular, non-sparse, i.i.d."
+
+# Cross-validation methodology (CTR23)
+cv_methodology:
+  small:  # <1,000 samples
+    method: "repeated_kfold"
+    n_splits: 10
+    n_repeats: 10
+  medium:  # 1,000 - 10,000 samples
+    method: "kfold"
+    n_splits: 10
+  large:  # >10,000 samples
+    method: "holdout"
+    test_size: 0.33
+
+# Model configuration
+model_params:
+  vspyct:
+    max_depth: 5
+    minimum_examples_to_split: 10
+    epochs: 500
+    lr: 0.01
+    subspace_size: 1.0
+
+  vspyct_gp:
+    # Inherits vspyct params plus:
+    tau: 4.5  # Mahalanobis distance threshold (sqrt(chi2_d(0.95)) for d~10)
+    kernel_type: "linear_rbf"  # Options: rbf, matern, linear, linear_rbf, polynomial
+    gp_training_iterations: 100
+    use_gp_mean_for_extrapolation: false  # Use prototype mean with GP variance for uncertainty
+
+# Metrics to compute
+metrics:
+  - mse      # Mean Squared Error
+  - rmse     # Root Mean Squared Error
+  - mae      # Mean Absolute Error
+  - r2       # R-squared
+  - mean_uncertainty  # GP posterior variance (VSpyctGP only)
+
+# Dataset subsets for different evaluation scenarios
+dataset_subsets:
+  # Quick test (2-3 datasets)
+  quick_test:
+    description: "Minimal test to verify pipeline works"
+    n_datasets: 3
+    size_filter: "small"
+
+  # Small benchmark (10 datasets)
+  small_benchmark:
+    description: "Small benchmark for development"
+    n_datasets: 10
+    size_filter: "all"
+
+  # Full benchmark (all datasets)
+  full_benchmark:
+    description: "Complete CTR23 benchmark"
+    n_datasets: null  # all available
+    size_filter: "all"
+
+# Reproducibility
+random_state: 42
+
+# Output configuration
+output:
+  save_predictions: false
+  save_uncertainties: true
+  save_per_fold: false
+  format: "csv"  # csv or json
